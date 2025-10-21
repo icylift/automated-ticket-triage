@@ -1,4 +1,4 @@
- id,subject,body,category,priority
+id,subject,body,category,priority
 1,"Can't login","I forgot my password and can't login to email.","Password","High"
 2,"Printer shows paper jam","Printer shows paper jam and won't print.","Hardware","Low"
 3,"VPN connection failed","VPN connection failed after Windows update.","Network","Critical"
