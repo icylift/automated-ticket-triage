@@ -1,0 +1,11 @@
+ id,subject,body,category,priority
+1,"Can't login","I forgot my password and can't login to email.","Password","High"
+2,"Printer shows paper jam","Printer shows paper jam and won't print.","Hardware","Low"
+3,"VPN connection failed","VPN connection failed after Windows update.","Network","Critical"
+4,"Request Photoshop install","Request to install Photoshop for the design team.","ServiceRequest","Low"
+5,"Blue screen after update","Windows shows BSOD after the latest update.","Incident","High"
+6,"Email not sending","Outgoing emails bounce back with 550 error.","Network","High"
+7,"Reset password for new hire","User needs password reset and account activation.","Password","High"
+8,"Laptop battery swelling","Laptop battery looks swollen and won't hold charge.","Hardware","Medium"
+9,"Need access to sales drive","Request access to shared sales folder for new employee.","ServiceRequest","Medium"
+10,"Ransomware-like behavior","Files encrypted and ransom note present on workstation.","Incident","Critical"
