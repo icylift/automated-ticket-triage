@@ -30,4 +30,24 @@ def train_and_save(df):
   #split for quick evaluation
   X_train, X_test, y_train, y_test = train_test_split( x, y, test_size=0.2, random_state=42, stratify=y )
 
-  
+# Pipline: TF-IDF  vectorizer + Logistic regression classifier 
+  pipeline = Pipeline([
+    ('tfidf', TfidfVectorizer(max_df=0.9, min_df=1, ngram_range=(1,2))),
+    ('clf', LogisticRegression(max_iter=1000))
+  ]) 
+
+  pipeline.fit(X_train, y_train)
+
+  # quick evaluation 
+  preds = pipeline.predic(X_test)
+  print("=== Classification report on test set ===")
+  print(classification_report(y_test, preds))
+
+  # ensure models directory exist then saves
+  os.makedirs(os.path.dirname(MODEL_OUT), exist_ok=True)
+  joblib.dump(pipeline, MODEL_OUT)
+  print(f"Saved pipline to {MODEL_OUT}")
+
+if __name__ == "__main__":
+  df = load_data(DATA_PATH)
+  train_and_save(df)
