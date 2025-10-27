@@ -39,7 +39,7 @@ def train_and_save(df):
   pipeline.fit(X_train, y_train)
 
   # quick evaluation 
-  preds = pipeline.predic(X_test)
+  preds = pipeline.predict(X_test)
   print("=== Classification report on test set ===")
   print(classification_report(y_test, preds))
 
