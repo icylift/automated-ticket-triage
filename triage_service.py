@@ -43,4 +43,71 @@ PRIORITY_KEYWORDS = {
   "High": re.compile(r"(urgent|asap|immediately|priority)", re.I)
 }
 
+def pick_asignee(category):
+  """Select an agent that has the category skill and lowest load. Fallback to the lowest load overall"""
+  candidates = [a for a in AGENTS if category in a['skills']]
+  if not candidates:
+    candidates = AGENTS
+  chosen = min(candidates, key=lambda a: a['load'])
+  # increment load to stimulate assignment (persist in production)
+  chosen['load'] += 1
+  return chosen['id']
+
+def compute_priority(category, subject, body):
+  base = CATEGORY_PRIORITY.get(category, "Medium")
+  text = (subject or "") + " " + (body or "")
+  if PRIORITY_KEYWORDS["Critical"].search(text):
+    return "Critical"
+  if PRIORITY_KEYWORDS["High"].search(text):
+    return "High"
+  return  base
+
+@app.route("/triage", methods=["POST"])
+def triage_ticket():
+  payload = request.get_json(force=True)
+  subject = payload.get("subject", "")
+  body = payload.get("body", "")
+  ticket_id = payload.get("ticket_id", f"local-{int(datetime.utcnow().timestamp())}")
+
+  # 1) Try rules first (High-precision)
+  rule_category = apply_rules(subject, body)
+  if rule_category:
+    category = rule_category
+    method = "rule"
+    confidence = 1.0
+  else:
+    #2 ) ML fallback
+    text = (subject or "") + " " + (body or "")
+    pred = pipline.predict([text])[0]
+    proba = pipline.predict_proba([text])[0]
+    labels = list(pipline.classes_)
+    confidence = float(proba[labels.index(pred)])
+    category = pred
+    method = "ml"
+
+  #3 ) compute priority
+  priority = compute_priority(category, subject, body)
+
+  #4 ) pick assignee
+  assignee = pick_asignee(category)
+
+  # prepare response 
+  resp = {
+    "ticket_id": ticket_id,
+    "category": category,
+    "method": method,
+    "confidence": round(confidence, 3),
+    "priority": priority,
+    "assignee": assignee,
+    "triage_at": datetime.utcnow().isoformat() + "Z"
+  }
+
+  # in prod: save triage decision to DB + call ticketing API to update tickets.
+  return jsonify(resp), 200
+
+if __name__ == "__main__":
+  app.run(host="0.0.0.0", port=5000, debug=True)
+  
+
+
 
