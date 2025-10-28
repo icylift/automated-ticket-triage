@@ -67,7 +67,7 @@ def triage_ticket():
   payload = request.get_json(force=True)
   subject = payload.get("subject", "")
   body = payload.get("body", "")
-  ticket_id = payload.get("ticket_id", f"local-{int(datetime.utcnow().timestamp())}")
+  ticket_id = payload.get("ticket_id", f"local-{int(datetime.now().timestamp())}")
 
   # 1) Try rules first (High-precision)
   rule_category = apply_rules(subject, body)
@@ -99,7 +99,7 @@ def triage_ticket():
     "confidence": round(confidence, 3),
     "priority": priority,
     "assignee": assignee,
-    "triage_at": datetime.utcnow().isoformat() + "Z"
+    "triage_at": datetime.now().isoformat() + "Z"
   }
 
   # in prod: save triage decision to DB + call ticketing API to update tickets.
@@ -107,7 +107,7 @@ def triage_ticket():
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=5000, debug=True)
-  
+
 
 
 
